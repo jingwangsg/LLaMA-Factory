@@ -1,4 +1,94 @@
 {
+  "mmo1-math-hard_w_ds": {
+    "file_name": "hard_w_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-hard_wo_ds": {
+    "file_name": "hard_wo_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-med_w_ds": {
+    "file_name": "med_w_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-med_wo_ds": {
+    "file_name": "med_wo_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-full_w_ds": {
+    "file_name": "full_w_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-full_wo_ds": {
+    "file_name": "full_wo_ds_sft.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "images": "images"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "human",
+      "assistant_tag": "gpt"
+    }
+  },
+  "mmo1-math-language-only": {
+    "file_name": "language_sft_data.json"
+  },
+  "mmo1-math-language-only-filtered": {
+    "file_name": "language_sft_data_filtered.json"
+  },
   "identity": {
     "file_name": "identity.json"
   },

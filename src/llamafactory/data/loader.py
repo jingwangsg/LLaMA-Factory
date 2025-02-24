@@ -45,6 +45,9 @@ if TYPE_CHECKING:
     from .processor import DatasetProcessor
     from .template import Template
 
+from PIL import ImageFile, Image
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
 
 logger = logging.get_logger(__name__)
 

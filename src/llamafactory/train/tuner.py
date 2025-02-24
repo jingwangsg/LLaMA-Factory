@@ -35,6 +35,9 @@ from .rm import run_rm
 from .sft import run_sft
 from .trainer_utils import get_ray_trainer, get_swanlab_callback
 
+from PIL import ImageFile, Image
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
 
 if is_ray_available():
     from ray.train.huggingface.transformers import RayTrainReportCallback
