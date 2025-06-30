@@ -1,0 +1,37 @@
+diff --git a/src/transformers/modeling_utils.py b/src/transformers/modeling_utils.py
+index b75151992c..104b35c691 100755
+--- a/src/transformers/modeling_utils.py
++++ b/src/transformers/modeling_utils.py
+@@ -4156,14 +4156,26 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin, GenerationMixin, PushToHubMix
+         # Instantiate model.
+         init_contexts = [no_init_weights(_enable=_fast_init)]
+ 
++        ds_config = deepspeed_config()
++
+         if is_deepspeed_zero3_enabled() and not is_quantized and not _is_ds_init_called:
+             import deepspeed
+-
+-            logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
+-            init_contexts = [
+-                deepspeed.zero.Init(config_dict_or_path=deepspeed_config()),
+-                set_zero3_state(),
+-            ] + init_contexts
++            mics_shard_size = ds_config["zero_optimization"].get("mics_shard_size", None)
++            print("DeepSpeed config:")
++            print(ds_config)
++
++            if mics_shard_size is not None:
++                logger.info("Detected DeepSpeed MiCS: activating zero.MiCS_Init() for this model")
++                init_contexts = [
++                    deepspeed.zero.MiCS_Init(config_dict_or_path=ds_config),
++                    set_zero3_state(),
++                ] + init_contexts
++            else:
++                logger.info("Detected DeepSpeed ZeRO-3: activating zero.init() for this model")
++                init_contexts = [
++                    deepspeed.zero.Init(config_dict_or_path=ds_config),
++                    set_zero3_state(),
++                ] + init_contexts
+         elif low_cpu_mem_usage:
+             if not is_accelerate_available():
+                 raise ImportError(
