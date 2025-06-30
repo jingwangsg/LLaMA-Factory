@@ -1122,7 +1122,7 @@ class Qwen2vlPlugin(BasePlugin):
             content = message["content"]
             while IMAGE_PLACEHOLDER in content:
                 if num_image_tokens >= len(image_grid_thw):
-                    raise ValueError(f"`len(images)` is less than the number of {IMAGE_PLACEHOLDER} tokens.")
+                    raise ValueError(f"`len(images)` is less than the number of {IMAGE_PLACEHOLDER} tokens. MESSAGE: {message}")
 
                 image_seqlen = image_grid_thw[num_image_tokens].prod() // merge_length if self.expand_mm_tokens else 1
                 content = content.replace(
@@ -1132,7 +1132,7 @@ class Qwen2vlPlugin(BasePlugin):
 
             while VIDEO_PLACEHOLDER in content:
                 if num_video_tokens >= len(video_grid_thw):
-                    raise ValueError(f"`len(videos)` is less than the number of {VIDEO_PLACEHOLDER} tokens.")
+                    raise ValueError(f"`len(videos)` is less than the number of {VIDEO_PLACEHOLDER} tokens. MESSAGE: {message}")
 
                 video_seqlen = video_grid_thw[num_video_tokens].prod() // merge_length if self.expand_mm_tokens else 1
                 content = content.replace(

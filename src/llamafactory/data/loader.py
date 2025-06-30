@@ -129,6 +129,7 @@ def _load_single_dataset(
             streaming=data_args.streaming,
         )
     else:
+        print(f"[DEBUG] load_dataset: {data_path}, {data_name}, {data_dir}, {data_files}, {dataset_attr.split}, {model_args.cache_dir}, {model_args.hf_hub_token}, {data_args.streaming}, {data_args.preprocessing_num_workers}, {model_args.trust_remote_code}")
         dataset = load_dataset(
             path=data_path,
             name=data_name,
@@ -180,7 +181,8 @@ def _get_merged_dataset(
         if (stage == "rm" and dataset_attr.ranking is False) or (stage != "rm" and dataset_attr.ranking is True):
             raise ValueError("The dataset is not applicable in the current training stage.")
 
-        datasets[dataset_name] = _load_single_dataset(dataset_attr, model_args, data_args, training_args)
+        with training_args.main_process_first(desc="load dataset", local=False):
+            datasets[dataset_name] = _load_single_dataset(dataset_attr, model_args, data_args, training_args)
 
     if merge:
         return merge_dataset(list(datasets.values()), data_args, seed=training_args.seed)
@@ -318,13 +320,13 @@ def get_dataset(
             raise ValueError("Turn off `streaming` when saving dataset to disk.")
 
     # Load and preprocess dataset
-    with training_args.main_process_first(desc="load dataset"):
+    with training_args.main_process_first(desc="load dataset", local=False):
         dataset = _get_merged_dataset(data_args.dataset, model_args, data_args, training_args, stage)
         eval_dataset = _get_merged_dataset(
             data_args.eval_dataset, model_args, data_args, training_args, stage, merge=training_args.do_predict
         )
 
-    with training_args.main_process_first(desc="pre-process dataset"):
+    with training_args.main_process_first(desc="pre-process dataset", local=False):
         dataset = _get_preprocessed_dataset(
             dataset, data_args, training_args, stage, template, tokenizer, processor, is_eval=False
         )

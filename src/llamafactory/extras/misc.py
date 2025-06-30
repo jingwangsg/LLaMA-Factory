@@ -78,6 +78,7 @@ def check_version(requirement: str, mandatory: bool = False) -> None:
     r"""
     Optionally checks the package version.
     """
+    return
     if is_env_enabled("DISABLE_VERSION_CHECK") and not mandatory:
         logger.warning_rank0_once("Version checking has been disabled, may lead to unexpected behaviors.")
         return

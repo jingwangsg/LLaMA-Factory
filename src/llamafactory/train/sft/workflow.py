@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from typing import TYPE_CHECKING, List, Optional
+import ray
 
 from ...data import SFTDataCollatorWith4DAttentionMask, get_dataset, get_template_and_fix_tokenizer
 from ...extras.constants import IGNORE_INDEX
@@ -35,6 +36,7 @@ if TYPE_CHECKING:
 
 
 logger = get_logger(__name__)
+
 
 
 def run_sft(
@@ -99,7 +101,9 @@ def run_sft(
 
     # Training
     if training_args.do_train:
-        train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+        
+        # train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+        train_result = trainer.train(resume_from_checkpoint=True)
         trainer.save_model()
         if finetuning_args.include_effective_tokens_per_second:
             train_result.metrics["effective_tokens_per_sec"] = calculate_tps(

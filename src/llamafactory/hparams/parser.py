@@ -339,6 +339,9 @@ def get_train_args(args: Optional[Union[Dict[str, Any], List[str]]] = None) -> _
             training_args.resume_from_checkpoint = None
     else:
         can_resume_from_checkpoint = True
+    
+    print(f"can_resume_from_checkpoint: {can_resume_from_checkpoint}")
+    print(f"training_args.resume_from_checkpoint: {training_args.resume_from_checkpoint}")
 
     if (
         training_args.resume_from_checkpoint is None
