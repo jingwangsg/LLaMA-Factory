@@ -47,12 +47,16 @@ class DatasetConverter:
         else:
             medias = medias[:]
 
-        if self.dataset_attr.load_from in ["script", "file"] and isinstance(medias[0], str):
+        if self.dataset_attr.load_from in ["script", "file"] and isinstance(
+            medias[0], str
+        ):
             for i in range(len(medias)):
                 if os.path.isfile(os.path.join(self.data_args.media_dir, medias[i])):
                     medias[i] = os.path.join(self.data_args.media_dir, medias[i])
                 else:
-                    logger.warning_rank0_once(f"Media {medias[i]} does not exist in `media_dir`. Use original path.")
+                    logger.warning_rank0_once(
+                        f"Media {medias[i]} does not exist in `media_dir`. Use original path."
+                    )
 
         return medias
 
@@ -68,7 +72,9 @@ class DatasetConverter:
 class AlpacaDatasetConverter(DatasetConverter):
     def __call__(self, example: Dict[str, Any]) -> Dict[str, Any]:
         prompt = []
-        if self.dataset_attr.history and isinstance(example[self.dataset_attr.history], list):
+        if self.dataset_attr.history and isinstance(
+            example[self.dataset_attr.history], list
+        ):
             for old_prompt, old_response in example[self.dataset_attr.history]:
                 prompt.append({"role": Role.USER.value, "content": old_prompt})
                 prompt.append({"role": Role.ASSISTANT.value, "content": old_response})
@@ -80,10 +86,19 @@ class AlpacaDatasetConverter(DatasetConverter):
         if self.dataset_attr.query and example[self.dataset_attr.query]:
             query.append(example[self.dataset_attr.query])
 
-        prompt.append({"role": Role.USER.value, "content": "\n".join(query)})  # "prompt\nquery"
+        prompt.append(
+            {"role": Role.USER.value, "content": "\n".join(query)}
+        )  # "prompt\nquery"
 
-        if self.dataset_attr.kto_tag and isinstance(example[self.dataset_attr.kto_tag], bool):  # kto example
-            response = [{"role": Role.ASSISTANT.value, "content": example[self.dataset_attr.response]}]
+        if self.dataset_attr.kto_tag and isinstance(
+            example[self.dataset_attr.kto_tag], bool
+        ):  # kto example
+            response = [
+                {
+                    "role": Role.ASSISTANT.value,
+                    "content": example[self.dataset_attr.response],
+                }
+            ]
             if example[self.dataset_attr.kto_tag]:
                 response = response + [{"role": Role.ASSISTANT.value, "content": ""}]
             else:
@@ -94,22 +109,51 @@ class AlpacaDatasetConverter(DatasetConverter):
             and isinstance(example[self.dataset_attr.rejected], str)
         ):  # pairwise example
             response = [
-                {"role": Role.ASSISTANT.value, "content": example[self.dataset_attr.chosen]},
-                {"role": Role.ASSISTANT.value, "content": example[self.dataset_attr.rejected]},
+                {
+                    "role": Role.ASSISTANT.value,
+                    "content": example[self.dataset_attr.chosen],
+                },
+                {
+                    "role": Role.ASSISTANT.value,
+                    "content": example[self.dataset_attr.rejected],
+                },
             ]
-        elif self.dataset_attr.response and isinstance(example[self.dataset_attr.response], str):  # normal example
-            response = [{"role": Role.ASSISTANT.value, "content": example[self.dataset_attr.response]}]
+        elif self.dataset_attr.response and isinstance(
+            example[self.dataset_attr.response], str
+        ):  # normal example
+            response = [
+                {
+                    "role": Role.ASSISTANT.value,
+                    "content": example[self.dataset_attr.response],
+                }
+            ]
         else:  # unsupervised
             response = []
 
         output = {
             "_prompt": prompt,
             "_response": response,
-            "_system": example[self.dataset_attr.system] if self.dataset_attr.system else "",
-            "_tools": example[self.dataset_attr.tools] if self.dataset_attr.tools else "",
-            "_images": self._find_medias(example[self.dataset_attr.images]) if self.dataset_attr.images else None,
-            "_videos": self._find_medias(example[self.dataset_attr.videos]) if self.dataset_attr.videos else None,
-            "_audios": self._find_medias(example[self.dataset_attr.audios]) if self.dataset_attr.audios else None,
+            "_system": (
+                example[self.dataset_attr.system] if self.dataset_attr.system else ""
+            ),
+            "_tools": (
+                example[self.dataset_attr.tools] if self.dataset_attr.tools else ""
+            ),
+            "_images": (
+                self._find_medias(example[self.dataset_attr.images])
+                if self.dataset_attr.images
+                else None
+            ),
+            "_videos": (
+                self._find_medias(example[self.dataset_attr.videos])
+                if self.dataset_attr.videos
+                else None
+            ),
+            "_audios": (
+                self._find_medias(example[self.dataset_attr.audios])
+                if self.dataset_attr.audios
+                else None
+            ),
         }
         return output
 
@@ -136,7 +180,9 @@ class SharegptDatasetConverter(DatasetConverter):
             system = messages[0][self.dataset_attr.content_tag]
             messages = messages[1:]
         else:
-            system = example[self.dataset_attr.system] if self.dataset_attr.system else ""
+            system = (
+                example[self.dataset_attr.system] if self.dataset_attr.system else ""
+            )
 
         aligned_messages = []
         broken_data = False
@@ -162,7 +208,9 @@ class SharegptDatasetConverter(DatasetConverter):
         if broken_data:
             logger.warning_rank0("Skipping this abnormal example.")
             prompt, response = [], []
-        elif self.dataset_attr.kto_tag and isinstance(example[self.dataset_attr.kto_tag], bool):  # kto example
+        elif self.dataset_attr.kto_tag and isinstance(
+            example[self.dataset_attr.kto_tag], bool
+        ):  # kto example
             prompt = aligned_messages[:-1]
             response = aligned_messages[-1:]
             if example[self.dataset_attr.kto_tag]:
@@ -202,11 +250,26 @@ class SharegptDatasetConverter(DatasetConverter):
             "_prompt": prompt,
             "_response": response,
             "_system": system,
-            "_tools": example[self.dataset_attr.tools] if self.dataset_attr.tools else "",
-            "_images": self._find_medias(example[self.dataset_attr.images]) if self.dataset_attr.images else None,
-            "_videos": self._find_medias(example[self.dataset_attr.videos]) if self.dataset_attr.videos else None,
-            "_audios": self._find_medias(example[self.dataset_attr.audios]) if self.dataset_attr.audios else None,
+            "_tools": (
+                example[self.dataset_attr.tools] if self.dataset_attr.tools else ""
+            ),
+            "_images": (
+                self._find_medias(example[self.dataset_attr.images])
+                if self.dataset_attr.images
+                else None
+            ),
+            "_videos": (
+                self._find_medias(example[self.dataset_attr.videos])
+                if self.dataset_attr.videos
+                else None
+            ),
+            "_audios": (
+                self._find_medias(example[self.dataset_attr.audios])
+                if self.dataset_attr.audios
+                else None
+            ),
         }
+
         return output
 
 
@@ -216,7 +279,9 @@ DATASET_CONVERTERS = {
 }
 
 
-def register_dataset_converter(name: str, dataset_converter: Type["DatasetConverter"]) -> None:
+def register_dataset_converter(
+    name: str, dataset_converter: Type["DatasetConverter"]
+) -> None:
     r"""
     Register a new dataset converter.
     """
@@ -226,7 +291,9 @@ def register_dataset_converter(name: str, dataset_converter: Type["DatasetConver
     DATASET_CONVERTERS[name] = dataset_converter
 
 
-def get_dataset_converter(name: str, dataset_attr: "DatasetAttr", data_args: "DataArguments") -> "DatasetConverter":
+def get_dataset_converter(
+    name: str, dataset_attr: "DatasetAttr", data_args: "DataArguments"
+) -> "DatasetConverter":
     r"""
     Gets a dataset converter.
     """
@@ -258,14 +325,20 @@ def align_dataset(
     if not data_args.streaming:
         kwargs = dict(
             num_proc=data_args.preprocessing_num_workers,
-            load_from_cache_file=(not data_args.overwrite_cache) or (training_args.local_process_index != 0),
+            load_from_cache_file=(not data_args.overwrite_cache)
+            or (training_args.local_process_index != 0),
             desc="Converting format of dataset",
         )
 
-    dataset_converter = get_dataset_converter(dataset_attr.formatting, dataset_attr, data_args)
-    return dataset.map(
+    dataset_converter = get_dataset_converter(
+        dataset_attr.formatting, dataset_attr, data_args
+    )
+    kwargs["load_from_cache_file"] = False
+    dataset_aligned = dataset.map(
         dataset_converter,
         batched=False,
         remove_columns=column_names,
         **kwargs,
     )
+
+    return dataset_aligned
