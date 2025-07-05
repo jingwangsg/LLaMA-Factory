@@ -15,6 +15,7 @@
 import os
 import sys
 from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Union
+import time
 
 import numpy as np
 from datasets import DatasetDict, load_dataset, load_from_disk
@@ -129,7 +130,8 @@ def _load_single_dataset(
             streaming=data_args.streaming,
         )
     else:
-        print(f"[DEBUG] load_dataset: {data_path}, {data_name}, {data_dir}, {data_files}, {dataset_attr.split}, {model_args.cache_dir}, {model_args.hf_hub_token}, {data_args.streaming}, {data_args.preprocessing_num_workers}, {model_args.trust_remote_code}")
+        print(f"[Call] load_dataset: {data_path}, {data_name}, {data_dir}, {data_files}, {dataset_attr.split}, {model_args.cache_dir}, {model_args.hf_hub_token}, {data_args.streaming}, {data_args.preprocessing_num_workers}, {model_args.trust_remote_code}")
+        st = time.time()
         dataset = load_dataset(
             path=data_path,
             name=data_name,
@@ -142,6 +144,7 @@ def _load_single_dataset(
             num_proc=data_args.preprocessing_num_workers,
             trust_remote_code=model_args.trust_remote_code,
         )
+        print(f"load_dataset time: {time.time() - st}")
 
     if dataset_attr.num_samples is not None and not data_args.streaming:
         target_num = dataset_attr.num_samples
