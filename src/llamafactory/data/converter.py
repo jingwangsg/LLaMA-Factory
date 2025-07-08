@@ -333,7 +333,6 @@ def align_dataset(
     dataset_converter = get_dataset_converter(
         dataset_attr.formatting, dataset_attr, data_args
     )
-    kwargs["load_from_cache_file"] = False
     dataset_aligned = dataset.map(
         dataset_converter,
         batched=False,
