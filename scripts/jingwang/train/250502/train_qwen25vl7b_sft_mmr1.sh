@@ -1,10 +1,14 @@
-source .venv/bin/activate
+source ../.venv/bin/activate
 set -ex
 
 export OMP_NUM_THREADS=4
 export WANDB_PROJECT="qwen25vl_math"
 export WANDB_MODE=${WANDB_MODE:-online}
 export HF_HUB_CACHE=/mnt/amlfs-02/shared/ckpts/
+# Disable dataset caching by pointing to temp directory
+# export HF_DATASETS_CACHE=/tmp/hf_datasets_cache_$$
+# export HF_MODULES_CACHE=/tmp/hf_modules_cache_$$
+# mkdir -p $HF_DATASETS_CACHE $HF_MODULES_CACHE
 
 MASTER_ADDR=${MASTER_ADDR:-localhost}
 MASTER_PORT=${MASTER_PORT:-29500}
@@ -36,7 +40,14 @@ else
     save_args="--save_strategy steps --save_steps $SAVE_STEPS --save_total_limit 5"
 fi
 
-torchrun --nnodes $NNODES \
+DEBUGPY=${DEBUGPY:-0}
+if [ $DEBUGPY -eq 1 ]; then
+    LAUNCHER="python -m debugpy --listen 5678 --wait-for-client -m torch.distributed.run"
+else
+    LAUNCHER="torchrun"
+fi
+
+$LAUNCHER --nnodes $NNODES \
     --nproc_per_node $NPROC_PER_NODE \
     --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
