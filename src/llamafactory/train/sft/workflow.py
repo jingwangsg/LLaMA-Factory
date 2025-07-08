@@ -131,7 +131,7 @@ def run_sft(
             for _ in os.listdir(training_args.output_dir)
             if _.startswith("checkpoint-")
         ]
-        resume_from_checkpoint = len(checkpoint_paths) > 0 and training_args.resume_from_checkpoint
+        resume_from_checkpoint = len(checkpoint_paths) > 0
 
         train_result = trainer.train(resume_from_checkpoint=resume_from_checkpoint)
         trainer.save_model()
