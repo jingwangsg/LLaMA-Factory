@@ -404,3 +404,29 @@ rayexec -n 32 \
     bash scripts/jingwang/train/250502/train_qwen25vl7b_sft_mmr1.sh
     """
 
+
+rayexec -n 32 \
+    --venv /mnt/amlfs-03/shared/jingwang/PROJECTS/mmo1/finetune/.venv \
+    --env_vars \
+    HF_HUB_CACHE=/mnt/amlfs-02/shared/ckpts/mmc/ \
+    WANDB_API_KEY=26dcd5fab9afa1c6f127a04db6e0af6521affbbb \
+    WANDB_ENTITY=mmo1 \
+    WANDB_PROJECT=mmr1_sft_0502 \
+    RAY_ENABLE_RECORD_ACTOR_TASK_LOGGING=1 \
+    TORCH_NCCL_TRACE_BUFFER_SIZE=2000 \
+    NCCL_DEBUG=INFO \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:False \
+    NCCL_CUMEM_ENABLE=0 \
+    NCCL_P2P_LEVEL=NVL \
+    --max_retries 20 \
+    --submission_id mmo1-math-qwen2.5_vl_3b-sft_mmr1_sft_0503_v10_mathinstruct_onlygemini_ep5 \
+    --cmd """
+    DATA=sft_0503_v10_prompt,mm_mathinstruct_gemini_withprompt \
+    RUN_NAME=mmo1-math-qwen2.5_vl_3b-sft_mmr1_sft_0503_v10_mathinstruct_onlygemini_ep5 \
+    DS=ds_z2_config \
+    EPOCHS=5 \
+    SAVE_STEPS=1000 \
+    MODEL=/mnt/amlfs-02/shared/ckpts/models--Qwen--Qwen2.5-VL-3B-Instruct/snapshots/66285546d2b821cf421d4f5eb2576359d3770cd3/ \
+    bash scripts/jingwang/train/250502/train_qwen25vl7b_sft_mmr1.sh
+    """
+
